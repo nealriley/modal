@@ -94,6 +94,41 @@ Unauthenticated liveness probe returning `200` and `{ "status": "ok", "uptime_s"
 
 Backend responsibility ends at returning the `clipboard.text` block; each client must handle writing to its OS clipboard.
 
+### `POST /v1/translate`
+Text-to-text endpoint that skips Whisper entirely. It hands the provided prompt to the Codex provider (non-interactive CLI) and returns a clipboard-ready snippet. Primary use case: instant CLI command generation without an audio recording.
+
+**Request**
+- Content-Type: `application/json`
+- Body:
+  ```json
+  {
+    "prompt": "list files then check git status",
+    "mode": "terminal",
+    "provider": "codex"
+  }
+  ```
+  - `prompt` (required): free-form text to transform.
+  - `mode` (required for now): only `terminal` is supported; additional modes will be added later.
+  - `provider` (optional): defaults to `codex`. Must reference a Codex-capable provider.
+
+**Response (200 OK)**
+```json
+{
+  "mode": "terminal",
+  "provider": "codex",
+  "text": "ls -la\ngit status"
+}
+```
+
+**Integration notes**
+- iOS Shortcut / Android client can hit this endpoint directly when they already have text (e.g., clipboard or typed prompt) instead of audio; it’s a single JSON POST followed by copying `text` to the clipboard.
+- Codex requires prior `codex login` in the deployment environment; the service fails fast with `422` if credentials are missing.
+- Enforce `mode=terminal` until alternative prompts are defined; clients should gate the UI accordingly.
+
+### Provider Registry & Codex usage
+- Whisper remains the default `/v1/transcriptions` provider, but specifying `provider=codex` runs the result through Codex’s CLI prompt so the returned clipboard text contains only deterministic commands (no narration).
+- `/v1/translate` always routes to Codex unless overridden; we expose `DEFAULT_TRANSLATE_PROVIDER` to keep environment config explicit.
+
 ## Error Handling
 All error responses use:
 ```json

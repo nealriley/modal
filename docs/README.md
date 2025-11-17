@@ -8,7 +8,7 @@ This hub centralizes every decision, action, and research artifact for the multi
 - [Context](context/README.md) — stakeholder notes, device priorities, goals
 - [Research](research/README.md) — market scans, benchmarks, competitive analysis
 - [Architecture](architecture/README.md) — diagrams, flows, backend/API plans
-- [Onboarding](onboarding/README.md) — how new collaborators ramp up
+- [Onboarding](onboarding/README.md) — how new collaborators ramp up (includes [iOS Shortcut setup](onboarding/ios-shortcut.md))
 - [Worklog](worklog/README.md) — dated notes, meeting minutes, daily syncs
 
 ## How to Use

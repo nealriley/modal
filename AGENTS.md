@@ -5,6 +5,10 @@ Guidance for any human or AI collaborators contributing to the multimodal transc
 ## Mission
 Deliver low-latency audio capture and transcription with mode-aware filtering (terminal, code, creative writing) and instant clipboard delivery across Android, iPad/iOS, macOS, Windows, and Steam Deck.
 
+## Repository Conventions
+- **Monorepo structure**: This repo is a monorepo with multiple project folders (backend, clients, docs, automation, etc.). Always identify which project area you’re touching and keep changes scoped to a small, coherent slice.
+- **Shared tmux usage**: When checking what work is currently in-flight on a Codespace or dev container, first inspect active `tmux` sessions. Run long‑running tasks (servers, experiments, watches) inside `tmux` so others can attach, observe logs, and reuse existing processes instead of starting competing ones.
+
 ## Core Roles
 1. **Research & Strategy Agent** — Tracks device priorities, surveys APIs, validates feasibility, keeps `docs/research` current.
 2. **Backend & ML Agent** — Designs the Codespaces-hosted transcription API, manages model/runtime choices, documents interfaces in `docs/architecture`.
@@ -21,6 +25,13 @@ Deliver low-latency audio capture and transcription with mode-aware filtering (t
 - **`docs/architecture`** — Reference diagrams and backend/client contracts during implementation. Update whenever APIs, sequencing, or infrastructure plans evolve.
 - **`docs/onboarding`** — New collaborators start here; seasoned contributors update it whenever tooling, setup steps, or collaboration rules change to keep ramp-up under 15 minutes.
 - **`docs/README.md`** — Entry point linking all sections; ensure new documents are referenced here for discoverability.
+
+## Service Management (Codex Plugin)
+- `scripts/service_manager.py` is the single orchestrator for backend lifecycle checks. Always run `python scripts/service_manager.py status` before backend-dependent work to confirm PID, tmux session, and public URL hint.
+- Long-lived processes run inside the shared tmux session `backend_service`. Use `python scripts/service_manager.py attach` (or `tmux -S .run/tmux/backend_service.sock attach -t backend_service`) to inspect output. Never spawn duplicate uvicorns outside tmux.
+- Control commands: `start`, `ensure`, `stop`, `restart`, and `logs`. Shell wrappers (`scripts/start_backend.sh`, `scripts/stop_backend.sh`) delegate to these.
+- If the service is running but unreachable externally, mark Codespaces port 8000 as **Public** (Ports panel or `gh codespace ports visibility -c $CODESPACE_NAME 8000:public` after `gh auth login`).
+- Capture restarts/failures in `docs/worklog` so others know what changed.
 
 ## Operating Principles
 - **Source of Truth** lives in this repo; reflect important conversations in ADRs or worklogs.

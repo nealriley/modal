@@ -1,0 +1,23 @@
+{
+  "name": "audio-clipboard-backend",
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "editor.formatOnSave": true
+      }
+    }
+  },
+  "postCreateCommand": "bash scripts/setup_whisper.sh && bash scripts/setup_cli.sh",
+  "postStartCommand": "python scripts/service_manager.py ensure",
+  "forwardPorts": [
+    8000
+  ],
+  "portsAttributes": {
+    "8000": {
+      "label": "backend",
+      "onAutoForward": "notify"
+    }
+  }
+}
